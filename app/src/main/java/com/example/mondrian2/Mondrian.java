@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 public class Mondrian {
 
     private static DataFrame<Object> summarized(DataFrame<Object> partition, String dim, List<String> qiList) {
@@ -187,9 +190,32 @@ public class Mondrian {
         return groupCounts.values().stream().allMatch(count -> count >= k);
     }
 
-    public static DataFrame<Object> runAnonymize(List<String> qiList, String dataFile,
+//    public static DataFrame<Object> runAnonymize(List<String> qiList, String dataFile,
+//                                                 String hierarchyFileDir, int k) throws IOException {
+//        DataFrame<Object> df = DataFrame.readCsv(dataFile);
+//
+//        Map<String, HierarchyTree> hierarchyTreeDict = new HashMap<>();
+//        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(hierarchyFileDir), "*.csv")) {
+//            for (Path path : stream) {
+//                String hierarchyType = path.getFileName().toString().split("_")[2].split("\\.")[0];
+//                hierarchyTreeDict.put(hierarchyType, new HierarchyTree(path.toString()));
+//            }
+//        }
+//
+//        df = mapTextToNum(df, qiList, hierarchyTreeDict);
+//        df = mondrian(df, qiList, k);
+//
+//        if (!checkKAnonymity(df, qiList, k)) {
+//            throw new RuntimeException("Not all partitions are k-anonymous");
+//        }
+//
+//        df = mapNumToText(df, qiList, hierarchyTreeDict);
+//        return df;
+//    }
+
+    public static DataFrame<Object> runAnonymize(List<String> qiList, InputStream dataInputStream,
                                                  String hierarchyFileDir, int k) throws IOException {
-        DataFrame<Object> df = DataFrame.readCsv(dataFile);
+        DataFrame<Object> df = DataFrame.readCsv(dataInputStream);
 
         Map<String, HierarchyTree> hierarchyTreeDict = new HashMap<>();
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(hierarchyFileDir), "*.csv")) {
@@ -210,61 +236,66 @@ public class Mondrian {
         return df;
     }
 
-    public static void main(String[] args) {
-        try {
-            Scanner scanner = new Scanner(System.in);
 
-            System.out.print("Enter the value of k (default is 5): ");
-            int k = scanner.hasNextInt() ? scanner.nextInt() : 5;
-            scanner.nextLine();
 
-            System.out.print("Enter the data file path (default is 'dataset/dataset.csv'): ");
-            String dataFilePath = scanner.nextLine().trim();
-            if (dataFilePath.isEmpty()) {
-                dataFilePath = "dataset/dataset.csv";
-            }
 
-            System.out.print("Enter the anonymized file directory path (default is 'dataset/anonymized/'): ");
-            String anonymizedFileDirPath = scanner.nextLine().trim();
-            if (anonymizedFileDirPath.isEmpty()) {
-                anonymizedFileDirPath = "dataset/anonymized/";
-            }
 
-            System.out.print("Enter the hierarchy file directory path (default is 'dataset/hierarchy/'): ");
-            String hierarchyFileDirPath = scanner.nextLine().trim();
-            if (hierarchyFileDirPath.isEmpty()) {
-                hierarchyFileDirPath = "dataset/hierarchy/";
-            }
 
-            if (!new File(dataFilePath).exists()) {
-                throw new FileNotFoundException("Data file not found: " + dataFilePath);
-            }
-
-            if (!new File(hierarchyFileDirPath).exists()) {
-                throw new FileNotFoundException("Hierarchy file directory not found: " + hierarchyFileDirPath);
-            }
-
-            File anonymizedDir = new File(anonymizedFileDirPath);
-            if (!anonymizedDir.exists()) {
-                anonymizedDir.mkdirs();
-            }
-
-            List<String> quasiIdentifiers = Arrays.asList(
-                    "sex", "age", "race", "marital-status", "education",
-                    "native-country", "workclass", "occupation"
-            );
-            List<String> sensitiveAttributes = Collections.singletonList("salary-class");
-            List<String> identifier = Arrays.asList("ID", "soc_sec_id", "given_name", "surname");
-
-            //DataFrame<Object> df = DataFrame.readCsv(dataFilePath);
-            DataFrame<Object> anonymizedDf = runAnonymize(quasiIdentifiers, dataFilePath, hierarchyFileDirPath, k);
-
-            String outputFilePath = anonymizedFileDirPath + "k_" + k + "_anonymized_dataset.csv";
-            anonymizedDf.writeCsv(outputFilePath);
-            System.out.println("Anonymized data saved to: " + outputFilePath);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//    public static void main(String[] args) {
+//        try {
+//        Scanner scanner = new Scanner(System.in);
+//
+//        System.out.print("Enter the value of k (default is 5): ");
+//        int k = scanner.hasNextInt() ? scanner.nextInt() : 5;
+//        scanner.nextLine();
+//
+//        System.out.print("Enter the data file path (default is 'dataset/dataset.csv'): ");
+//        String dataFilePath = scanner.nextLine().trim();
+//        if (dataFilePath.isEmpty()) {
+//            dataFilePath = "dataset/dataset.csv";
+//        }
+//
+//        System.out.print("Enter the anonymized file directory path (default is 'dataset/anonymized/'): ");
+//        String anonymizedFileDirPath = scanner.nextLine().trim();
+//        if (anonymizedFileDirPath.isEmpty()) {
+//            anonymizedFileDirPath = "dataset/anonymized/";
+//        }
+//
+//        System.out.print("Enter the hierarchy file directory path (default is 'dataset/hierarchy/'): ");
+//        String hierarchyFileDirPath = scanner.nextLine().trim();
+//        if (hierarchyFileDirPath.isEmpty()) {
+//            hierarchyFileDirPath = "dataset/hierarchy/";
+//        }
+//
+//        if (!new File(dataFilePath).exists()) {
+//            throw new FileNotFoundException("Data file not found: " + dataFilePath);
+//        }
+//
+//        if (!new File(hierarchyFileDirPath).exists()) {
+//            throw new FileNotFoundException("Hierarchy file directory not found: " + hierarchyFileDirPath);
+//        }
+//
+//        File anonymizedDir = new File(anonymizedFileDirPath);
+//        if (!anonymizedDir.exists()) {
+//            anonymizedDir.mkdirs();
+//        }
+//
+//        List<String> quasiIdentifiers = Arrays.asList(
+//                "sex", "age", "race", "marital-status", "education",
+//                "native-country", "workclass", "occupation"
+//        );
+//        List<String> sensitiveAttributes = Collections.singletonList("salary-class");
+//        List<String> identifier = Arrays.asList("ID", "soc_sec_id", "given_name", "surname");
+//
+//        //DataFrame<Object> df = DataFrame.readCsv(dataFilePath);
+//        DataFrame<Object> anonymizedDf = runAnonymize(quasiIdentifiers, dataFilePath, hierarchyFileDirPath, k);
+//
+//        String outputFilePath = anonymizedFileDirPath + "k_" + k + "_anonymized_dataset.csv";
+//        anonymizedDf.writeCsv(outputFilePath);
+//        System.out.println("Anonymized data saved to: " + outputFilePath);
+//
+//    } catch (Exception e) {
+//        e.printStackTrace();
+//    }
+//}
 }
