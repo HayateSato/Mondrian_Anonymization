@@ -47,6 +47,7 @@ dependencies {
 
 //    compile "com.google.guava:guava:$guavaVersion"
 
-    implementation 'com.github.cardillo:joinery:1.8'
+//    implementation 'com.github.cardillo:joinery:1.10'
+    implementation group: 'sh.joinery', name: 'joinery-dataframe', version: '1.10'
 
 }

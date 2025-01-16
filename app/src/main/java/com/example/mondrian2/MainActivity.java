@@ -106,50 +106,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-//    private void executeAnonymization() {
-//
-////        Toast.makeText(this, "executeAnonymization code is initiated", Toast.LENGTH_SHORT).show();
-//
-//
-////        AssetManager assetManager = getAssets(); //////////////////////////////////
-//
-//        try {
-////            InputStream inputStream = assetManager.open("dataset.csv"); //////////////////////////////////
-////            BufferedReader AnonymizingData = new BufferedReader(new InputStreamReader(inputStream)); //////////////////////////////////
-//
-//            // Set default values
-//            int k = 5;
-//            String dataFilePath = "app/src/main/assets/dataset.csv";
-//            String anonymizedFileDirPath = getExternalFilesDir(null) + "/anonymized/";
-//            String hierarchyFileDirPath = getExternalFilesDir(null) + "/hierarchy/";
-//
-//            // Ensure the anonymized file directory exists
-//            File anonymizedDir = new File(anonymizedFileDirPath);
-//            if (!anonymizedDir.exists()) {
-//                anonymizedDir.mkdirs();
-//                Toast.makeText(this, "Anonymization directory: " + anonymizedFileDirPath, Toast.LENGTH_LONG).show();
-//            }
-//
-//            List<String> quasiIdentifiers = Arrays.asList(
-//                    "sex", "age", "race", "marital-status", "education",
-//                    "native-country", "workclass", "occupation"
-//            );
-//
-//            // Execute Mondrian algorithm
-//            DataFrame anonymizedDf = Mondrian.runAnonymize(quasiIdentifiers, dataFilePath, hierarchyFileDirPath, k);
-////            DataFrame anonymizedDf = Mondrian.runAnonymize(quasiIdentifiers, AnonymizingData, hierarchyFileDirPath, k);
-//
-//            // Save the anonymized DataFrame
-//            String outputFilePath = anonymizedFileDirPath + "k_" + k + "_anonymized_dataset.csv";
-//            anonymizedDf.writeCsv(outputFilePath);
-//
-//            runOnUiThread(() -> Toast.makeText(this, "Anonymization completed. Output saved to: " + outputFilePath, Toast.LENGTH_LONG).show());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            runOnUiThread(() -> Toast.makeText(this, "Error during anonymization: " + e.getMessage(), Toast.LENGTH_LONG).show());
-//        }
-//    }
-
     private void executeAnonymization() {
         try {
             // Set default values
@@ -174,6 +130,9 @@ public class MainActivity extends AppCompatActivity {
 
             // Execute Mondrian algorithm
             DataFrame<Object> anonymizedDf = Mondrian.runAnonymize(quasiIdentifiers, dataInputStream, hierarchyFileDirPath, k);
+
+            Toast.makeText(this, "Anonymization button clicked.", Toast.LENGTH_LONG).show();
+
 
             // Save the anonymized DataFrame
             String outputFilePath = anonymizedFileDirPath + "k_" + k + "_anonymized_dataset.csv";
